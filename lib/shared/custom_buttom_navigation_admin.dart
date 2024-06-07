@@ -1,8 +1,11 @@
+import 'package:alsintan_app/views/admin/dashboard_admin_page.dart';
+import 'package:alsintan_app/views/daftar_alsintan_page.dart';
+import 'package:alsintan_app/views/profile/profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
-class CustomBottomNavigationItem extends StatefulWidget {
-  const CustomBottomNavigationItem({Key? key}) : super(key: key);
+class CustomBottomNavigationItemAdmin extends StatefulWidget {
+  const CustomBottomNavigationItemAdmin({Key? key}) : super(key: key);
 
   @override
   _CustomBottomNavigationItemState createState() =>
@@ -10,14 +13,14 @@ class CustomBottomNavigationItem extends StatefulWidget {
 }
 
 class _CustomBottomNavigationItemState
-    extends State<CustomBottomNavigationItem> {
+    extends State<CustomBottomNavigationItemAdmin> {
   int _currentIndex = 0; // Indeks halaman aktif
 
   // Daftar halaman yang akan ditampilkan pada navigasi
   final List<Widget> _pages = [
-    // InformationPage(),
-    // IotPage(),
-    // ProfilePage(),
+    DashboardAdmin(),
+    DaftarAlsintan(),
+    ProfilePage()
   ];
 
   @override
@@ -47,16 +50,16 @@ class _CustomBottomNavigationItemState
                     ? Color(0xFF31C48D) // Warna ikon saat item Beranda terpilih
                     : Color(0xff828282), // Warna ikon saat item lain terpilih
               ),
-              label: 'Informasi',
+              label: 'Beranda',
             ),
             BottomNavigationBarItem(
               icon: Image.asset(
-                'assets/images/gps.png', // Gantilah dengan path gambar ikon Log Aktivitas
+                'assets/images/Icon-Log.png', // Gantilah dengan path gambar ikon Log Aktivitas
                 color: _currentIndex == 1
                     ? Color(0xFF31C48D) // Warna ikon saat item Log Aktivitas terpilih
                     : Color(0xff828282), // Warna ikon saat item lain terpilih
               ),
-              label: 'Integrasi IoT',
+              label: 'Daftar Alsintan',
             ),
             BottomNavigationBarItem(
               icon: Image.asset(

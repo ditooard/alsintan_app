@@ -1,5 +1,9 @@
 import 'dart:io';
-import 'package:alsintan_app/views/landing_page.dart';
+import 'package:alsintan_app/views/admin/detail_user_page.dart';
+import 'package:alsintan_app/views/admin/landing_page_admin.dart';
+import 'package:alsintan_app/views/profile/detail_profile_page.dart';
+import 'package:alsintan_app/views/profile/profile_page.dart';
+import 'package:alsintan_app/views/user/landing_page_user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -52,9 +56,13 @@ class MyApp extends StatelessWidget {
       initialRoute: '/splash',
       routes: {
         '/splash': (context) => SplashPage(),
-        '/landingPage': (context) => LandingPage(),
         '/register': (context) => RegisterPage(),
-        '/register': (context) => LoginPage(),
+        '/login': (context) => LoginPage(),
+        '/landingPageAdmin': (context) => LandingPageAdmin(),
+        '/landingPageUser': (context) => LandingPageUser(),
+        '/profile': (context) => ProfilePage(),
+        '/detailProfile': (context) => DetailProfile(),
+        '/detailUser': (context) => DetailUser(),
       },
     );
   }

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-class DetailUser extends StatefulWidget {
+class DetailProfile extends StatefulWidget {
   @override
-  State<DetailUser> createState() => _DetailUser();
+  State<DetailProfile> createState() => _DetailProfile();
 }
 
-class _DetailUser extends State<DetailUser> {
+class _DetailProfile extends State<DetailProfile> {
   @override
   void initState() {
     super.initState();
@@ -93,7 +93,7 @@ class _DetailUser extends State<DetailUser> {
                     ),
                     const SizedBox(width: 5),
                     Text(
-                      'Detail User',
+                      'Data Pribadi',
                       style: TextStyle(
                         color: Colors.black,
                         fontSize: 18,
@@ -353,6 +353,37 @@ class _DetailUser extends State<DetailUser> {
                             ),
                           ),
                         ],
+                      ),
+                    ),
+                    const SizedBox(height: 40),
+                    Container(
+                      width: 500,
+                      height: 50.57,
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pushReplacementNamed(context, '');
+                        },
+                        style: ElevatedButton.styleFrom(
+                          primary: Color(0xFF31C48D), // Background color
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(17),
+                          ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 12.87),
+                          child: Text(
+                            'Simpan !',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.w500,
+                              height: 0,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ],
