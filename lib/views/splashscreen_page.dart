@@ -18,7 +18,7 @@ class _SplashPageState extends State<SplashPage> {
 
     Future.delayed(Duration(seconds: 3), () {
       // Navigate to the '/started' route
-      Navigator.pushReplacementNamed(context, '/landingPageAdmin');
+      Navigator.pushReplacementNamed(context, '/landingPageUser');
     });
 
     // Timer(Duration(seconds: 3), () {
