@@ -1,3 +1,4 @@
+import 'package:alsintan_app/views/admin/daftar_user_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:alsintan_app/models/font.dart';
@@ -337,13 +338,24 @@ class _DashboardAdmin extends State<DashboardAdmin> {
                                                             ),
                                                           ),
                                                         ),
-                                                        Container(
-                                                          width: 18 * fem,
-                                                          height: 18 * fem,
-                                                          child: Image.asset(
-                                                            'assets/images/info-circle.png',
-                                                            width: 375 * fem,
-                                                            height: 273 * fem,
+                                                        GestureDetector(
+                                                          onTap: () {
+                                                            Navigator.push(
+                                                              context,
+                                                              MaterialPageRoute(
+                                                                  builder:
+                                                                      (context) =>
+                                                                          DaftarUser()),
+                                                            );
+                                                          },
+                                                          child: Container(
+                                                            width: 18 * fem,
+                                                            height: 18 * fem,
+                                                            child: Image.asset(
+                                                              'assets/images/info-circle.png',
+                                                              width: 375 * fem,
+                                                              height: 273 * fem,
+                                                            ),
                                                           ),
                                                         ),
                                                       ],
