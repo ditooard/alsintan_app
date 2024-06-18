@@ -1,9 +1,12 @@
 import 'dart:convert';
 
+import 'package:alsintan_app/views/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:alsintan_app/shared/loading.dart';
+
+import '../services/myserverconfig.dart';
 
 class RegisterPage extends StatefulWidget {
   @override
@@ -11,21 +14,14 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPage extends State<RegisterPage> {
-  final TextEditingController _namaOrtuController = TextEditingController();
-  final TextEditingController _namaBalitaController = TextEditingController();
+  final TextEditingController _namaLengkapController = TextEditingController();
   final TextEditingController _noHpController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passController = TextEditingController();
-  final TextEditingController _confirmPassController = TextEditingController();
   bool _isPasswordVisible = false;
-  bool _isConfirmPasswordVisible = false;
   bool _isLoading = false;
-  FocusNode _namaOrtu = FocusNode();
-  FocusNode _namaBalita = FocusNode();
+  FocusNode _namaLengkap = FocusNode();
   FocusNode _noHp = FocusNode();
-  FocusNode _email = FocusNode();
   FocusNode _pass = FocusNode();
-  FocusNode _confirmPass = FocusNode();
 
   @override
   void initState() {
@@ -38,58 +34,53 @@ class _RegisterPage extends State<RegisterPage> {
     FocusScope.of(context).requestFocus(nextFocus);
   }
 
-  // void _registerUser(BuildContext context) {
-  //   setState(() {
-  //     _isLoading = true; // Set loading menjadi true saat fungsi dimulai
-  //   });
+  void _registerUser(BuildContext context) {
+    setState(() {
+      _isLoading = true; // Set loading menjadi true saat fungsi dimulai
+    });
 
-  //   String _namaOrtu = _namaOrtuController.text;
-  //   String _namaBalita = _namaBalitaController.text;
-  //   String _noHp = _noHpController.text;
-  //   String _email = _emailController.text;
-  //   String _pass = _passController.text;
-  //   String _confirmPass = _confirmPassController.text;
+    String _namaLengkap = _namaLengkapController.text;
+    String _noHp = _noHpController.text;
+    String _pass = _passController.text;
 
-  //   var body = jsonEncode({
-  //     "name": "$_namaOrtu",
-  //     "child_name": "$_namaBalita",
-  //     "phone_number": "$_noHp",
-  //     "email": "$_email",
-  //     "password": "$_pass"
-  //   });
+    var body = jsonEncode({
+      "nama_lengkap": "$_namaLengkap",
+      "no_hp": "$_noHp",
+      "password": "$_pass"
+    });
 
-  //   http
-  //       .post(Uri.parse("${MyServerConfig.server}/api/v1/auth/register"),
-  //           headers: {"Content-Type": "application/json"}, body: body)
-  //       .then((response) {
-  //     print(response.body);
-  //     if (response.statusCode == 200) {
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         const SnackBar(
-  //           content: Text("Register Success"),
-  //           backgroundColor: Colors.green,
-  //         ),
-  //       );
-  //       Navigator.push(
-  //         context,
-  //         MaterialPageRoute(
-  //           builder: (content) => LoginPage(),
-  //         ),
-  //       );
-  //     } else {
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         const SnackBar(
-  //           content: Text("Pembuatan Akun Gagal. Mohon koreksi kembali"),
-  //           backgroundColor: Colors.red,
-  //         ),
-  //       );
-  //     }
-  //   }).whenComplete(() {
-  //     setState(() {
-  //       _isLoading = false;
-  //     });
-  //   });
-  // }
+    http
+        .post(Uri.parse("${MyServerConfig.server}/pengguna/register"),
+            headers: {"Content-Type": "application/json"}, body: body)
+        .then((response) {
+      print(response.body);
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Register Success"),
+            backgroundColor: Colors.green,
+          ),
+        );
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (content) => LoginPage(),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Pembuatan Akun Gagal. Mohon koreksi kembali"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }).whenComplete(() {
+      setState(() {
+        _isLoading = false;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -153,12 +144,12 @@ class _RegisterPage extends State<RegisterPage> {
                                   width: 287,
                                   height: 52,
                                   child: TextFormField(
-                                    controller: _namaOrtuController,
-                                    focusNode: _namaOrtu,
+                                    controller: _namaLengkapController,
+                                    focusNode: _namaLengkap,
                                     textInputAction: TextInputAction.next,
                                     onFieldSubmitted: (term) {
                                       _fieldFocusChange(
-                                          context, _namaOrtu, _namaBalita);
+                                          context, _namaLengkap, _noHp);
                                     },
                                     decoration: InputDecoration(
                                       hintText: "Masukan Nama Anda",
@@ -211,12 +202,11 @@ class _RegisterPage extends State<RegisterPage> {
                                   width: 287,
                                   height: 52,
                                   child: TextFormField(
-                                    controller: _namaBalitaController,
-                                    focusNode: _namaBalita,
+                                    controller: _noHpController,
+                                    focusNode: _noHp,
                                     textInputAction: TextInputAction.next,
                                     onFieldSubmitted: (term) {
-                                      _fieldFocusChange(
-                                          context, _namaBalita, _noHp);
+                                      _fieldFocusChange(context, _noHp, _pass);
                                     },
                                     decoration: InputDecoration(
                                       hintText: "Masukan Nomor Handphone anda",
@@ -272,10 +262,7 @@ class _RegisterPage extends State<RegisterPage> {
                                     controller: _passController,
                                     focusNode: _pass,
                                     textInputAction: TextInputAction.next,
-                                    onFieldSubmitted: (term) {
-                                      _fieldFocusChange(
-                                          context, _pass, _confirmPass);
-                                    },
+
                                     validator: (val) =>
                                         val!.isEmpty || (val.length < 3)
                                             ? "Please enter password"
@@ -333,84 +320,7 @@ class _RegisterPage extends State<RegisterPage> {
                       ),
                       Positioned(
                         left: 0,
-                        top: 270,
-                        child: Container(
-                          width: 287,
-                          height: 75.39,
-                          child: Stack(
-                            children: [
-                              Positioned(
-                                left: 0,
-                                top: 24.82,
-                                child: Container(
-                                  width: 287,
-                                  height: 52,
-                                  child: TextFormField(
-                                    controller: _passController,
-                                    focusNode: _pass,
-                                    textInputAction: TextInputAction.next,
-                                    onFieldSubmitted: (term) {
-                                      _fieldFocusChange(
-                                          context, _pass, _confirmPass);
-                                    },
-                                    validator: (val) =>
-                                        val!.isEmpty || (val.length < 3)
-                                            ? "Please enter password"
-                                            : null,
-                                    obscureText:
-                                        !_isPasswordVisible, // This hides the entered text as dots for a password field
-                                    decoration: InputDecoration(
-                                      hintText: "Masukan Ulang Password Anda",
-                                      hintStyle: TextStyle(
-                                          fontSize: 12, color: Colors.grey),
-                                      contentPadding:
-                                          EdgeInsets.only(top: 0, left: 20),
-                                      border: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                            color: Color(0xFFDBD7EB)),
-                                        borderRadius: BorderRadius.circular(17),
-                                      ),
-                                      suffixIcon: IconButton(
-                                        icon: Icon(
-                                          _isPasswordVisible
-                                              ? Icons.visibility
-                                              : Icons.visibility_off,
-                                          color: Colors.grey, // Warna ikon mata
-                                        ),
-                                        onPressed: () {
-                                          setState(() {
-                                            _isPasswordVisible =
-                                                !_isPasswordVisible;
-                                          });
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                child: SizedBox(
-                                  width: 268,
-                                  height: 19.31,
-                                  child: Text(
-                                    'Ulangi Password',
-                                    style: TextStyle(
-                                      color: Color(0xFF1E1349),
-                                      fontSize: 14,
-                                      fontFamily: 'Poppins',
-                                      fontWeight: FontWeight.w400,
-                                      height: 0,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 0,
-                        top: 380,
+                        top: 300,
                         child: Container(
                           width: 287,
                           height: 50.57,
@@ -418,7 +328,7 @@ class _RegisterPage extends State<RegisterPage> {
                               ? LoadingIndicator()
                               : ElevatedButton(
                                   onPressed: () {
-                                    // _registerUser(context);
+                                    _registerUser(context);
                                   },
                                   style: ElevatedButton.styleFrom(
                                     primary:
@@ -447,7 +357,7 @@ class _RegisterPage extends State<RegisterPage> {
                       ),
                       Positioned(
                         left: 35,
-                        top: 460,
+                        top: 390,
                         child: SizedBox(
                           width: 311,
                           child: GestureDetector(

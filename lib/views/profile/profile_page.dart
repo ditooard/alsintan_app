@@ -16,8 +16,9 @@ class _ProfilPage extends State<ProfilePage> {
   void _logout(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
 
-    // Hapus token dari SharedPreferences
-    await prefs.remove('token');
+    await prefs.remove('token_type');
+    await prefs.remove('acces_token');
+    await prefs.remove('role');
     print('Token dihapus.');
 
     Navigator.pushReplacementNamed(context, '/login');
@@ -37,7 +38,6 @@ class _ProfilPage extends State<ProfilePage> {
         title: Padding(
           padding: EdgeInsets.only(top: 50, bottom: 10),
           child: Text('Profile'),
-          
         ),
       ),
       body: SingleChildScrollView(
@@ -330,8 +330,7 @@ class _ProfilPage extends State<ProfilePage> {
                                         ),
                                       ),
                                       SizedBox(
-                                        width:
-                                            4, 
+                                        width: 4,
                                       ),
                                       TextButton(
                                         onPressed: () {

@@ -9,7 +9,7 @@ class DaftarAlsintan extends StatefulWidget {
 }
 
 class _DaftarAlsintan extends State<DaftarAlsintan> {
-  final List<String> alsintanNames = [
+  List<String> alsintanNames = [
     "Traktor Roda Dua",
     "Traktor Roda Tiga",
     "Traktor Roda Empat",
@@ -87,15 +87,20 @@ class _DaftarAlsintan extends State<DaftarAlsintan> {
                       ),
                     ),
                     const SizedBox(width: 12),
-                    Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: AssetImage('assets/images/qrcode.png'),
-                          fit: BoxFit.fill,
-                        ),
-                      ),
+                    IconButton(
+                      icon: Icon(Icons.qr_code),
+                      onPressed: () {
+                        // QR code button action
+                      },
+                    ),
+                    const SizedBox(width: 12),
+                    IconButton(
+                      icon: Icon(Icons.delete),
+                      onPressed: () {
+                        setState(() {
+                          alsintanNames.removeAt(index);
+                        });
+                      },
                     ),
                   ],
                 ),
@@ -107,4 +112,3 @@ class _DaftarAlsintan extends State<DaftarAlsintan> {
     );
   }
 }
-

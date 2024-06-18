@@ -43,7 +43,6 @@ class _DashboardUser extends State<DashboardUser> {
       appBar: AppBar(
         toolbarHeight: 80,
         automaticallyImplyLeading: false,
-        backgroundColor: Color(0xFF31C48D),
         title: Padding(
           padding: EdgeInsets.only(top: 50, bottom: 10),
           child: Text('Alat dan Mesin Pertanian'),

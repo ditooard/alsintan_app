@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:alsintan_app/views/admin/landing_page_admin.dart';
+import 'package:alsintan_app/views/user/landing_page_user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -30,50 +32,72 @@ class _LoginPage extends State<LoginPage> {
     FocusScope.of(context).requestFocus(nextFocus);
   }
 
-  // void _login(BuildContext context) {
-  //   setState(() {
-  //     _isLoading = true;
-  //   });
-  //   String _key = _keyController.text;
-  //   String _pass = _passController.text;
+  void _login(BuildContext context) {
+    setState(() {
+      _isLoading = true;
+    });
+    String _key = _keyController.text;
+    String _pass = _passController.text;
 
-  //   var body = jsonEncode({"key": "$_key", "password": "$_pass"});
+    var body = jsonEncode({"no_hp": "$_key", "password": "$_pass"});
 
-  //   http
-  //       .post(Uri.parse("${MyServerConfig.server}/api/v1/auth/login"),
-  //           headers: {"Content-Type": "application/json"}, body: body)
-  //       .then((response) async {
-  //     print(response.body);
-  //     if (response.statusCode == 200) {
-  //       SharedPreferences prefs = await SharedPreferences.getInstance();
-  //       await prefs.setString('token', json.decode(response.body)['token']);
+    http
+        .post(Uri.parse("${MyServerConfig.server}/pengguna/login"),
+            headers: {"Content-Type": "application/json"}, body: body)
+        .then((response) async {
+      print(response.body);
+      if (response.statusCode == 200) {
+        var responseBody = json.decode(response.body);
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('token_type', responseBody['token_type']);
+        await prefs.setString('access_token', responseBody['access_token']);
+        await prefs.setString(
+            'role', responseBody['role']); // Simpan peran pengguna
 
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         const SnackBar(
-  //           content: Text("Login Success"),
-  //           backgroundColor: Colors.green,
-  //         ),
-  //       );
-  //       Navigator.push(
-  //         context,
-  //         MaterialPageRoute(
-  //           builder: (content) => LandingPage(),
-  //         ),
-  //       );
-  //     } else {
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         const SnackBar(
-  //           content: Text("Login Gagal. Akun atau kata sandi salah!"),
-  //           backgroundColor: Colors.red,
-  //         ),
-  //       );
-  //     }
-  //   }).whenComplete(() {
-  //     setState(() {
-  //       _isLoading = false;
-  //     });
-  //   });
-  // }
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Login Success"),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        // Arahkan pengguna berdasarkan peran
+        if (responseBody['role'] == 'admin') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (content) => LandingPageAdmin(),
+            ),
+          );
+        } else if (responseBody['role'] == 'pengguna') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (content) => LandingPageUser(),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Peran tidak dikenali!"),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Login Gagal. Akun atau kata sandi salah!"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }).whenComplete(() {
+      setState(() {
+        _isLoading = false;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -144,8 +168,7 @@ class _LoginPage extends State<LoginPage> {
                                       _fieldFocusChange(context, _key, _pass);
                                     },
                                     decoration: InputDecoration(
-                                      hintText:
-                                          'Masukan Nomor Handphone',
+                                      hintText: 'Masukan Nomor Handphone',
                                       hintStyle: TextStyle(
                                           fontSize: 12, color: Colors.grey),
                                       contentPadding:
@@ -258,7 +281,7 @@ class _LoginPage extends State<LoginPage> {
                               ? LoadingIndicator()
                               : ElevatedButton(
                                   onPressed: () {
-                                    // _login(context);
+                                    _login(context);
                                   },
                                   style: ElevatedButton.styleFrom(
                                     primary:
