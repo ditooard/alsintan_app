@@ -1,9 +1,11 @@
 import 'package:alsintan_app/views/detail_alsintan_page.dart';
 import 'package:flutter/material.dart';
-import 'package:alsintan_app/models/book.dart';
-import 'package:alsintan_app/models/user.dart';
+import 'package:alsintan_app/models/alsinta.dart';
 import 'package:alsintan_app/services/myserverconfig.dart';
 import 'package:alsintan_app/views/user/tambah_alsintan_page.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DashboardUser extends StatefulWidget {
   @override
@@ -11,20 +13,13 @@ class DashboardUser extends StatefulWidget {
 }
 
 class _DashboardUser extends State<DashboardUser> {
-  List<Book> bookList = <Book>[];
+  List<Alsinta> alsintaList = <Alsinta>[];
   late double screenWidth, screenHeight;
-
-  int numofpage = 1;
-  int curpage = 1;
-  int numofresult = 0;
-  var color;
-  String title = "";
-  String author = "";
 
   @override
   void initState() {
     super.initState();
-    loadBooks(title, author);
+    loadAlsintas();
   }
 
   bool isSearchVisible = false;
@@ -50,23 +45,24 @@ class _DashboardUser extends State<DashboardUser> {
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          await refreshBooks(author, title);
+          await refreshAlsintas();
         },
-        child: bookList.isEmpty
-            ? const Center(child: Text("No Data"))
+        child: alsintaList.isEmpty
+            ? Center(child: CircularProgressIndicator())
             : Column(
                 children: [
                   Expanded(
                     child: GridView.count(
                       crossAxisCount: axiscount,
-                      children: List.generate(bookList.length, (index) {
+                      children: List.generate(alsintaList.length, (index) {
                         return Card(
                           child: InkWell(
                             onTap: () {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => DetailAlsintan(),
+                                  builder: (context) => DetailAlsintan(
+                                      alsinta: alsintaList[index]),
                                 ),
                               );
                             },
@@ -77,8 +73,8 @@ class _DashboardUser extends State<DashboardUser> {
                                   child: Container(
                                     width: screenWidth,
                                     padding: const EdgeInsets.all(4.0),
-                                    child: Image.asset(
-                                      "assets/images/${bookList[index].bookId}.png",
+                                    child: Image.network(
+                                      alsintaList[index].image,
                                       fit: BoxFit.fill,
                                     ),
                                   ),
@@ -89,9 +85,7 @@ class _DashboardUser extends State<DashboardUser> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
-                                        truncateString(bookList[index]
-                                            .bookTitle
-                                            .toString()),
+                                        truncateString(alsintaList[index].merk),
                                         textAlign: TextAlign.center,
                                         style: const TextStyle(
                                             fontWeight: FontWeight.bold,
@@ -132,49 +126,44 @@ class _DashboardUser extends State<DashboardUser> {
     }
   }
 
-  Future<void> refreshBooks(String title, author) async {
+  Future<void> refreshAlsintas() async {
     await Future.delayed(Duration(seconds: 2));
     setState(() {
-      loadDummyBooks();
+      loadAlsintas();
     });
   }
 
-  void loadBooks(String title, author) {
-    setState(() {
-      loadDummyBooks();
-    });
-  }
+  Future<void> loadAlsintas() async {
+    Center(child: CircularProgressIndicator());
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final savedToken = prefs.getString('access_token');
 
-  void loadDummyBooks() {
-    bookList = [
-      Book(
-        bookId: '1',
-        bookTitle: 'Traktor Roda 2',
-        bookAuthor: 'Author 1',
-        bookPrice: '10.0',
-        bookQty: '5',
-      ),
-      Book(
-        bookId: '2',
-        bookTitle: 'Traktor Roda 2',
-        bookAuthor: 'Author 2',
-        bookPrice: '15.0',
-        bookQty: '3',
-      ),
-      Book(
-          bookId: '3',
-          bookTitle: 'Traktor Roda 2',
-          bookAuthor: 'Author 3',
-          bookPrice: '20.0',
-          bookQty: '7'),
-      Book(
-          bookId: '3',
-          bookTitle: 'Traktor Roda 2',
-          bookAuthor: 'Author 3',
-          bookPrice: '20.0',
-          bookQty: '7'),
-    ];
-    numofpage = 1;
-    numofresult = bookList.length;
+      if (savedToken == null) {
+        throw Exception('No token found');
+      }
+
+      final response = await http.get(
+        Uri.parse('${MyServerConfig.server}/pengguna/alsinta'),
+        headers: {
+          'Authorization': 'Bearer $savedToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final List<dynamic> alsintaJson = data['data'];
+        setState(() {
+          alsintaList =
+              alsintaJson.map((json) => Alsinta.fromJson(json)).toList();
+        });
+      } else {
+        print('Failed to load alsintas, status code: ${response.statusCode}');
+        throw Exception('Failed to load alsintas');
+      }
+    } catch (e) {
+      print('Exception: $e');
+      throw Exception('Failed to load alsintas');
+    }
   }
 }

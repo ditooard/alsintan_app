@@ -42,13 +42,7 @@ class _SplashPageState extends State<SplashPage> {
       } else if (role == 'pengguna') {
         Navigator.pushReplacementNamed(context, '/landingPageUser');
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Sesi Login Habis, silahkan Login ulang"),
-            backgroundColor: Colors.red,
-          ),
-        );
-        Navigator.pushReplacementNamed(context, '/login');
+        Navigator.pushReplacementNamed(context, '/register');
       }
     } else {
       Navigator.pushReplacementNamed(context, '/register');

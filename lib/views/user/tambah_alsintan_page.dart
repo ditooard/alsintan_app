@@ -159,9 +159,10 @@ class _TambahAlsintan extends State<TambahAlsintan> {
         try {
           var jsonData = jsonDecode(responseBody.body);
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text("Insert Book Success."),
+            content: Text("Tambah Alsintan Berhasil."),
             backgroundColor: Colors.green,
           ));
+          Navigator.pushReplacementNamed(context, '/landingPageUser');
         } catch (e) {
           print("Error decoding JSON: $e");
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(

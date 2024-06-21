@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DetailProfile extends StatefulWidget {
   @override
@@ -6,9 +7,37 @@ class DetailProfile extends StatefulWidget {
 }
 
 class _DetailProfile extends State<DetailProfile> {
+  TextEditingController namaLengkapController = TextEditingController();
+  TextEditingController nomorHpController = TextEditingController();
+  TextEditingController alamatController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
+    loadProfileData();
+  }
+
+  Future<void> loadProfileData() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      setState(() {
+        namaLengkapController.text = prefs.getString('nama_lengkap') ?? '';
+        nomorHpController.text = prefs.getString('no_hp') ?? '';
+        alamatController.text = prefs.getString('alamat') ?? '';
+      });
+
+      print('${namaLengkapController.text}');
+    } catch (e) {
+      print('Error loading profile data: $e');
+    }
+  }
+
+  @override
+  void dispose() {
+    namaLengkapController.dispose();
+    nomorHpController.dispose();
+    alamatController.dispose();
+    super.dispose();
   }
 
   @override
@@ -168,23 +197,23 @@ class _DetailProfile extends State<DetailProfile> {
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                   ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        'Dhimas Afri Setiawan',
-                                        style: TextStyle(
-                                          color: Color(0xFF333333),
-                                          fontSize: 12,
-                                          fontFamily: 'Plus Jakarta Sans',
-                                          fontWeight: FontWeight.w400,
-                                          height: 0,
-                                        ),
+                                  child: TextFormField(
+                                    controller: namaLengkapController,
+                                    style: TextStyle(
+                                      color: Color(0xFF333333),
+                                      fontSize: 12,
+                                      fontFamily: 'Plus Jakarta Sans',
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                    decoration: InputDecoration(
+                                      border: InputBorder.none,
+                                      hintStyle: TextStyle(
+                                        color: Colors.grey[400],
+                                        fontSize: 12,
+                                        fontFamily: 'Plus Jakarta Sans',
+                                        fontWeight: FontWeight.w400,
                                       ),
-                                    ],
+                                    ),
                                   ),
                                 ),
                               ],
@@ -247,23 +276,23 @@ class _DetailProfile extends State<DetailProfile> {
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                   ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        '+628763716123456',
-                                        style: TextStyle(
-                                          color: Color(0xFF333333),
-                                          fontSize: 12,
-                                          fontFamily: 'Plus Jakarta Sans',
-                                          fontWeight: FontWeight.w400,
-                                          height: 0,
-                                        ),
+                                  child: TextFormField(
+                                    controller: nomorHpController,
+                                    style: TextStyle(
+                                      color: Color(0xFF333333),
+                                      fontSize: 12,
+                                      fontFamily: 'Plus Jakarta Sans',
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                    decoration: InputDecoration(
+                                      border: InputBorder.none,
+                                      hintStyle: TextStyle(
+                                        color: Colors.grey[400],
+                                        fontSize: 12,
+                                        fontFamily: 'Plus Jakarta Sans',
+                                        fontWeight: FontWeight.w400,
                                       ),
-                                    ],
+                                    ),
                                   ),
                                 ),
                               ],
@@ -326,27 +355,24 @@ class _DetailProfile extends State<DetailProfile> {
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                   ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Expanded(
-                                        child: SizedBox(
-                                          child: Text(
-                                            'Jl. Kantil No.rt 02/3, Kepundung, Wlahar, Kec. Adipala, Kabupaten Cilacap, Jawa Tengah 53271',
-                                            style: TextStyle(
-                                              color: Color(0xFF333333),
-                                              fontSize: 12,
-                                              fontFamily: 'Plus Jakarta Sans',
-                                              fontWeight: FontWeight.w400,
-                                              height: 0,
-                                            ),
-                                          ),
-                                        ),
+                                  child: TextFormField(
+                                    controller: alamatController,
+                                    maxLines: null,
+                                    style: TextStyle(
+                                      color: Color(0xFF333333),
+                                      fontSize: 12,
+                                      fontFamily: 'Plus Jakarta Sans',
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                    decoration: InputDecoration(
+                                      border: InputBorder.none,
+                                      hintStyle: TextStyle(
+                                        color: Colors.grey[400],
+                                        fontSize: 12,
+                                        fontFamily: 'Plus Jakarta Sans',
+                                        fontWeight: FontWeight.w400,
                                       ),
-                                    ],
+                                    ),
                                   ),
                                 ),
                               ],

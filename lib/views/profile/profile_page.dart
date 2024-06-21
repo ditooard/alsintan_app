@@ -8,16 +8,34 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilPage extends State<ProfilePage> {
+  String namaLengkap = '';
+
   @override
   void initState() {
     super.initState();
+    loadProfileData();
+  }
+
+  Future<void> loadProfileData() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      setState(() {
+        namaLengkap = prefs.getString('nama_lengkap') ?? '';
+      });
+
+      print('$namaLengkap');
+    } catch (e) {
+      print('Error loading profile data: $e');
+    }
   }
 
   void _logout(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
-
     await prefs.remove('token_type');
     await prefs.remove('acces_token');
+    await prefs.remove('nama_lengkap');
+    await prefs.remove('no_hp');
+    await prefs.remove('alamat');
     await prefs.remove('role');
     print('Token dihapus.');
 
@@ -87,7 +105,9 @@ class _ProfilPage extends State<ProfilePage> {
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     Text(
-                                      'D',
+                                      namaLengkap.isNotEmpty
+                                              ? namaLengkap[0]
+                                              : '',
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontSize: 38.40,
@@ -111,7 +131,9 @@ class _ProfilPage extends State<ProfilePage> {
                                       SizedBox(
                                         width: double.infinity,
                                         child: Text(
-                                          'Nama Pemilik Alsintan',
+                                          namaLengkap.isNotEmpty
+                                              ? namaLengkap
+                                              : '',
                                           style: TextStyle(
                                             color: Color(0xFF333333),
                                             fontSize: 16,

@@ -51,8 +51,12 @@ class _LoginPage extends State<LoginPage> {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('token_type', responseBody['token_type']);
         await prefs.setString('access_token', responseBody['access_token']);
+        await prefs.setString('nama_lengkap', responseBody['nama_lengkap']);
+        await prefs.setString('no_hp', responseBody['no_hp']);
+        await prefs.setString('alamat', responseBody['alamat'] ?? '');
         await prefs.setString(
-            'role', responseBody['role']); // Simpan peran pengguna
+            'role', responseBody['role']);
+        
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

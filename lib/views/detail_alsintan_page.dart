@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:alsintan_app/models/alsinta.dart';
 
 class DetailAlsintan extends StatefulWidget {
+  final Alsinta alsinta;
 
+  DetailAlsintan({required this.alsinta});
 
   @override
   State<DetailAlsintan> createState() => _DetailAlsintan();
@@ -9,45 +12,13 @@ class DetailAlsintan extends StatefulWidget {
 
 class _DetailAlsintan extends State<DetailAlsintan> {
   late double screenWidth, screenHeight;
-  DateTime _selectedDate = DateTime.now();
-  TextEditingController _dateController = TextEditingController();
-  FocusNode _namaIbu = FocusNode();
-  FocusNode _bpjsAnak = FocusNode();
-  FocusNode _jenisBpjs = FocusNode();
-  FocusNode _urutanAnak = FocusNode();
-  FocusNode _noKK = FocusNode();
-  FocusNode _nikAnak = FocusNode();
-  FocusNode _nikAyah = FocusNode();
-  FocusNode _nikIbu = FocusNode();
-  FocusNode _bb = FocusNode();
-  FocusNode _pb = FocusNode();
-  FocusNode _pekerjaanAyah = FocusNode();
-  FocusNode _pekerjaanIbu = FocusNode();
-  FocusNode _pendidikanAyah = FocusNode();
-  FocusNode _pendidikanIbu = FocusNode();
+
   @override
   void initState() {
     super.initState();
-    _dateController.text = _formattedDate(_selectedDate);
   }
 
-  void dispose() {
-    _namaIbu.dispose();
-    _bpjsAnak.dispose();
-    _jenisBpjs.dispose();
-    _urutanAnak.dispose();
-    _noKK.dispose();
-    _nikAnak.dispose();
-    _nikAyah.dispose();
-    _nikIbu.dispose();
-    _bb.dispose();
-    _pb.dispose();
-    _pekerjaanAyah.dispose();
-    _pekerjaanIbu.dispose();
-    _pendidikanAyah.dispose();
-    _pendidikanIbu.dispose();
-    super.dispose();
-  }
+
 
   void _fieldFocusChange(
       BuildContext context, FocusNode currentFocus, FocusNode nextFocus) {
@@ -59,32 +30,6 @@ class _DetailAlsintan extends State<DetailAlsintan> {
     return date != null
         ? '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year.toString()}'
         : '';
-  }
-
-  Future<void> selectDate() async {
-    DateTime? selectedDate = await showDatePicker(
-      context: context,
-      initialDate: _selectedDate,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
-      builder: (BuildContext context, Widget? child) {
-        return Theme(
-          data: ThemeData.light().copyWith(
-            primaryColor: Colors.orange,
-            colorScheme: ColorScheme.light(primary: Colors.orange),
-            buttonTheme: ButtonThemeData(textTheme: ButtonTextTheme.primary),
-          ),
-          child: child!,
-        );
-      },
-    );
-
-    if (selectedDate != null) {
-      setState(() {
-        _selectedDate = selectedDate;
-        _dateController.text = _formattedDate(_selectedDate);
-      });
-    }
   }
 
   @override
@@ -227,8 +172,8 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                       SizedBox(
                         height: screenHeight * 0.4,
                         width: screenWidth,
-                        child: Image.asset(
-                          "assets/images/1.png",
+                        child: Image.network(
+                          widget.alsinta.image,
                           fit: BoxFit.fill,
                         ),
                       ),
@@ -269,13 +214,9 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                             Container(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 24),
-                              child: TextField(
-                                focusNode: _bpjsAnak,
+                              child: TextFormField(
                                 textInputAction: TextInputAction.next,
-                                onSubmitted: (term) {
-                                  _fieldFocusChange(
-                                      context, _bpjsAnak, _jenisBpjs);
-                                },
+                                initialValue: widget.alsinta.namaPemilik,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
@@ -333,13 +274,9 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                             Container(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 24),
-                              child: TextField(
-                                focusNode: _jenisBpjs,
+                              child: TextFormField(
                                 textInputAction: TextInputAction.next,
-                                onSubmitted: (term) {
-                                  _fieldFocusChange(
-                                      context, _jenisBpjs, _urutanAnak);
-                                },
+                                initialValue: widget.alsinta.kelompokTani,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
@@ -397,13 +334,9 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                             Container(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 24),
-                              child: TextField(
-                                focusNode: _urutanAnak,
+                              child: TextFormField(
                                 textInputAction: TextInputAction.next,
-                                onSubmitted: (term) {
-                                  _fieldFocusChange(
-                                      context, _urutanAnak, _noKK);
-                                },
+                                initialValue: widget.alsinta.profesiPemilik,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
@@ -461,12 +394,10 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                             Container(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 24),
-                              child: TextField(
-                                focusNode: _noKK,
+                              child: TextFormField(
                                 textInputAction: TextInputAction.next,
-                                onSubmitted: (term) {
-                                  _fieldFocusChange(context, _noKK, _nikAnak);
-                                },
+                                initialValue:
+                                    widget.alsinta.profesiSampinganPemilik,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
@@ -524,13 +455,9 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                             Container(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 24),
-                              child: TextField(
-                                focusNode: _nikAnak,
+                              child: TextFormField(
                                 textInputAction: TextInputAction.next,
-                                onSubmitted: (term) {
-                                  _fieldFocusChange(
-                                      context, _nikAnak, _nikAyah);
-                                },
+                                initialValue: widget.alsinta.merk,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
@@ -588,12 +515,9 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                             Container(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 24),
-                              child: TextField(
-                                focusNode: _nikAyah,
+                              child: TextFormField(
                                 textInputAction: TextInputAction.next,
-                                onSubmitted: (term) {
-                                  _fieldFocusChange(context, _nikAyah, _nikIbu);
-                                },
+                                initialValue: widget.alsinta.asalAlsintan,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
@@ -651,12 +575,9 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                             Container(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 24),
-                              child: TextField(
-                                focusNode: _nikIbu,
+                              child: TextFormField(
                                 textInputAction: TextInputAction.next,
-                                onSubmitted: (term) {
-                                  _fieldFocusChange(context, _nikIbu, _bb);
-                                },
+                                initialValue: widget.alsinta.pertamaPenggunaOperasional,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
@@ -714,12 +635,9 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                             Container(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 24),
-                              child: TextField(
-                                focusNode: _bb,
+                              child: TextFormField(
                                 textInputAction: TextInputAction.next,
-                                onSubmitted: (term) {
-                                  _fieldFocusChange(context, _bb, _pb);
-                                },
+                                initialValue: widget.alsinta.terahirPenggunaOperasional,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
@@ -777,13 +695,9 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                             Container(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 24),
-                              child: TextField(
-                                focusNode: _pb,
+                              child: TextFormField(
                                 textInputAction: TextInputAction.next,
-                                onSubmitted: (term) {
-                                  _fieldFocusChange(
-                                      context, _pb, _pekerjaanAyah);
-                                },
+                                initialValue: widget.alsinta.daerahPenggunaanOperasional,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
@@ -841,13 +755,10 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                             Container(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 24),
-                              child: TextField(
-                                focusNode: _pekerjaanAyah,
+                              child: TextFormField(
+
                                 textInputAction: TextInputAction.next,
-                                onSubmitted: (term) {
-                                  _fieldFocusChange(
-                                      context, _pekerjaanAyah, _pekerjaanIbu);
-                                },
+                                initialValue: widget.alsinta.waktuOperasionalSekaliPakai,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
@@ -905,13 +816,9 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                             Container(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 24),
-                              child: TextField(
-                                focusNode: _pekerjaanIbu,
+                              child: TextFormField(
                                 textInputAction: TextInputAction.next,
-                                onSubmitted: (term) {
-                                  _fieldFocusChange(
-                                      context, _pekerjaanIbu, _pendidikanAyah);
-                                },
+                                initialValue: widget.alsinta.perawatanHarian,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
@@ -969,13 +876,9 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                             Container(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 24),
-                              child: TextField(
-                                focusNode: _pendidikanAyah,
+                              child: TextFormField(
                                 textInputAction: TextInputAction.next,
-                                onSubmitted: (term) {
-                                  _fieldFocusChange(
-                                      context, _pendidikanAyah, _pendidikanIbu);
-                                },
+                                initialValue: widget.alsinta.tempatPembelianSukuCadang,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
@@ -1033,13 +936,9 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                             Container(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 24),
-                              child: TextField(
-                                focusNode: _pendidikanAyah,
+                              child: TextFormField(
                                 textInputAction: TextInputAction.next,
-                                onSubmitted: (term) {
-                                  _fieldFocusChange(
-                                      context, _pendidikanAyah, _pendidikanIbu);
-                                },
+                                initialValue: widget.alsinta.pendanaanPerawatan,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
@@ -1097,13 +996,9 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                             Container(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 24),
-                              child: TextField(
-                                focusNode: _pendidikanAyah,
+                              child: TextFormField(
                                 textInputAction: TextInputAction.next,
-                                onSubmitted: (term) {
-                                  _fieldFocusChange(
-                                      context, _pendidikanAyah, _pendidikanIbu);
-                                },
+                                initialValue: widget.alsinta.tempatPembelianBahanBakar,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
@@ -1161,13 +1056,9 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                             Container(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 24),
-                              child: TextField(
-                                focusNode: _pendidikanAyah,
+                              child: TextFormField(
                                 textInputAction: TextInputAction.next,
-                                onSubmitted: (term) {
-                                  _fieldFocusChange(
-                                      context, _pendidikanAyah, _pendidikanIbu);
-                                },
+                                initialValue: widget.alsinta.kendalaPerawatan,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
@@ -1225,13 +1116,9 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                             Container(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 24),
-                              child: TextField(
-                                focusNode: _pendidikanAyah,
+                              child: TextFormField(
                                 textInputAction: TextInputAction.next,
-                                onSubmitted: (term) {
-                                  _fieldFocusChange(
-                                      context, _pendidikanAyah, _pendidikanIbu);
-                                },
+                                initialValue: widget.alsinta.terahirService,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
@@ -1289,13 +1176,9 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                             Container(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 24),
-                              child: TextField(
-                                focusNode: _pendidikanAyah,
+                              child: TextFormField(
                                 textInputAction: TextInputAction.next,
-                                onSubmitted: (term) {
-                                  _fieldFocusChange(
-                                      context, _pendidikanAyah, _pendidikanIbu);
-                                },
+                                initialValue: widget.alsinta.bengkelTerdekat,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
@@ -1353,13 +1236,9 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                             Container(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 24),
-                              child: TextField(
-                                focusNode: _pendidikanAyah,
+                              child: TextFormField(
                                 textInputAction: TextInputAction.next,
-                                onSubmitted: (term) {
-                                  _fieldFocusChange(
-                                      context, _pendidikanAyah, _pendidikanIbu);
-                                },
+                                initialValue: widget.alsinta.bengkelTerdekatPerawatan,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
@@ -1417,13 +1296,9 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                             Container(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 24),
-                              child: TextField(
-                                focusNode: _pendidikanAyah,
+                              child: TextFormField(
                                 textInputAction: TextInputAction.next,
-                                onSubmitted: (term) {
-                                  _fieldFocusChange(
-                                      context, _pendidikanAyah, _pendidikanIbu);
-                                },
+                                initialValue: widget.alsinta.tanggapanUserUntukAlsintan,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
