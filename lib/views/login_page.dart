@@ -53,6 +53,7 @@ class _LoginPage extends State<LoginPage> {
         await prefs.setString('access_token', responseBody['access_token']);
         await prefs.setString('nama_lengkap', responseBody['nama_lengkap']);
         await prefs.setString('no_hp', responseBody['no_hp']);
+        await prefs.setInt('id', responseBody['id']);
         await prefs.setString('alamat', responseBody['alamat'] ?? '');
         await prefs.setString(
             'role', responseBody['role']);

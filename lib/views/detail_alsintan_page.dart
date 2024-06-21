@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:alsintan_app/models/alsinta.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DetailAlsintan extends StatefulWidget {
   final Alsinta alsinta;
@@ -12,13 +13,21 @@ class DetailAlsintan extends StatefulWidget {
 
 class _DetailAlsintan extends State<DetailAlsintan> {
   late double screenWidth, screenHeight;
+  String role = ''; // Variable untuk menyimpan role dari SharedPreferences
 
   @override
   void initState() {
     super.initState();
+    loadRole();
   }
 
-
+  void loadRole() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      role =
+          prefs.getString('role') ?? ''; // Membaca role dari SharedPreferences
+    });
+  }
 
   void _fieldFocusChange(
       BuildContext context, FocusNode currentFocus, FocusNode nextFocus) {
@@ -26,48 +35,44 @@ class _DetailAlsintan extends State<DetailAlsintan> {
     FocusScope.of(context).requestFocus(nextFocus);
   }
 
-  String _formattedDate(DateTime? date) {
-    return date != null
-        ? '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year.toString()}'
-        : '';
-  }
-
   @override
   Widget build(BuildContext context) {
     screenHeight = MediaQuery.of(context).size.height;
     screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
-      bottomNavigationBar: BottomAppBar(
-        elevation: 100,
-        color: Color(0xFFFFFFFF), // Change background color
-        child: Container(
-          padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
-          child: ElevatedButton(
-            onPressed: () {
-              // Add your onPressed logic here
-            },
-            style: ElevatedButton.styleFrom(
-              minimumSize: Size(200, 50), // Adjust size as needed
-              padding: EdgeInsets.all(0), // No padding
-              primary: Color(0xFF31C48D),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+      bottomNavigationBar: role == 'admin'
+          ? null // Jika role adalah admin, maka bottom navigation bar tidak ditampilkan
+          : BottomAppBar(
+              elevation: 100,
+              color: Color(0xFFFFFFFF),
+              child: Container(
+                padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
+                child: ElevatedButton(
+                  onPressed: () {
+                    // Add your onPressed logic here
+                  },
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: Size(200, 50),
+                    padding: EdgeInsets.all(0),
+                    primary: Color(0xFF31C48D),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    elevation: 4,
+                  ),
+                  child: Text(
+                    'Simpan',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontFamily: 'Plus Jakarta Sans',
+                      fontWeight: FontWeight.w400,
+                      height: 0,
+                    ),
+                  ),
+                ),
               ),
-              elevation: 4,
             ),
-            child: Text(
-              'Simpan',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontFamily: 'Plus Jakarta Sans',
-                fontWeight: FontWeight.w400,
-                height: 0,
-              ),
-            ),
-          ),
-        ),
-      ),
       body: SingleChildScrollView(
         child: SafeArea(
           child: Container(
@@ -577,7 +582,8 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                                   const EdgeInsets.symmetric(horizontal: 24),
                               child: TextFormField(
                                 textInputAction: TextInputAction.next,
-                                initialValue: widget.alsinta.pertamaPenggunaOperasional,
+                                initialValue:
+                                    widget.alsinta.pertamaPenggunaOperasional,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
@@ -637,7 +643,8 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                                   const EdgeInsets.symmetric(horizontal: 24),
                               child: TextFormField(
                                 textInputAction: TextInputAction.next,
-                                initialValue: widget.alsinta.terahirPenggunaOperasional,
+                                initialValue:
+                                    widget.alsinta.terahirPenggunaOperasional,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
@@ -697,7 +704,8 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                                   const EdgeInsets.symmetric(horizontal: 24),
                               child: TextFormField(
                                 textInputAction: TextInputAction.next,
-                                initialValue: widget.alsinta.daerahPenggunaanOperasional,
+                                initialValue:
+                                    widget.alsinta.daerahPenggunaanOperasional,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
@@ -756,9 +764,9 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 24),
                               child: TextFormField(
-
                                 textInputAction: TextInputAction.next,
-                                initialValue: widget.alsinta.waktuOperasionalSekaliPakai,
+                                initialValue:
+                                    widget.alsinta.waktuOperasionalSekaliPakai,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
@@ -878,7 +886,8 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                                   const EdgeInsets.symmetric(horizontal: 24),
                               child: TextFormField(
                                 textInputAction: TextInputAction.next,
-                                initialValue: widget.alsinta.tempatPembelianSukuCadang,
+                                initialValue:
+                                    widget.alsinta.tempatPembelianSukuCadang,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
@@ -998,7 +1007,8 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                                   const EdgeInsets.symmetric(horizontal: 24),
                               child: TextFormField(
                                 textInputAction: TextInputAction.next,
-                                initialValue: widget.alsinta.tempatPembelianBahanBakar,
+                                initialValue:
+                                    widget.alsinta.tempatPembelianBahanBakar,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
@@ -1238,7 +1248,8 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                                   const EdgeInsets.symmetric(horizontal: 24),
                               child: TextFormField(
                                 textInputAction: TextInputAction.next,
-                                initialValue: widget.alsinta.bengkelTerdekatPerawatan,
+                                initialValue:
+                                    widget.alsinta.bengkelTerdekatPerawatan,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
@@ -1298,7 +1309,8 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                                   const EdgeInsets.symmetric(horizontal: 24),
                               child: TextFormField(
                                 textInputAction: TextInputAction.next,
-                                initialValue: widget.alsinta.tanggapanUserUntukAlsintan,
+                                initialValue:
+                                    widget.alsinta.tanggapanUserUntukAlsintan,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color

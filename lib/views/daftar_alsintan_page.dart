@@ -21,17 +21,25 @@ class _DaftarAlsintan extends State<DaftarAlsintan> {
   }
 
   Future<void> loadAlsintas() async {
-    
     try {
       final prefs = await SharedPreferences.getInstance();
       final savedToken = prefs.getString('access_token');
+      final role = prefs.getString('role');
 
       if (savedToken == null) {
         throw Exception('No token found');
       }
 
+      if (role == null) {
+        throw Exception('No role found');
+      }
+
+      final uri = role == 'admin'
+          ? '${MyServerConfig.server}/admin/alsinta-all'
+          : '${MyServerConfig.server}/pengguna/alsinta';
+
       final response = await http.get(
-        Uri.parse('${MyServerConfig.server}/pengguna/alsinta'),
+        Uri.parse(uri),
         headers: {
           'Authorization': 'Bearer $savedToken',
         },
@@ -44,13 +52,15 @@ class _DaftarAlsintan extends State<DaftarAlsintan> {
           alsintaList =
               alsintaJson.map((json) => Alsinta.fromJson(json)).toList();
         });
+
+        print(response.body);
       } else {
         print('Failed to load alsintas, status code: ${response.statusCode}');
         throw Exception('Failed to load alsintas');
       }
     } catch (e) {
       print('Exception: $e');
-      throw Exception('Failed to load alsintas');
+      throw Exception('Failed to load alsintas: $e');
     }
   }
 

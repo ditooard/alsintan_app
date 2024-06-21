@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
-
+import 'package:alsintan_app/models/user.dart';
 class DetailUser extends StatefulWidget {
+  
+  final User user;
+
+  DetailUser({required this.user});
+
   @override
   State<DetailUser> createState() => _DetailUser();
 }
@@ -175,7 +180,7 @@ class _DetailUser extends State<DetailUser> {
                                         CrossAxisAlignment.center,
                                     children: [
                                       Text(
-                                        'Dhimas Afri Setiawan',
+                                        widget.user.namaLengkap,
                                         style: TextStyle(
                                           color: Color(0xFF333333),
                                           fontSize: 12,
@@ -254,7 +259,7 @@ class _DetailUser extends State<DetailUser> {
                                         CrossAxisAlignment.center,
                                     children: [
                                       Text(
-                                        '+628763716123456',
+                                        widget.user.noHp,
                                         style: TextStyle(
                                           color: Color(0xFF333333),
                                           fontSize: 12,
@@ -335,7 +340,7 @@ class _DetailUser extends State<DetailUser> {
                                       Expanded(
                                         child: SizedBox(
                                           child: Text(
-                                            'Jl. Kantil No.rt 02/3, Kepundung, Wlahar, Kec. Adipala, Kabupaten Cilacap, Jawa Tengah 53271',
+                                            widget.user.alamat,
                                             style: TextStyle(
                                               color: Color(0xFF333333),
                                               fontSize: 12,

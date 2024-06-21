@@ -1,7 +1,10 @@
 import 'package:alsintan_app/views/admin/detail_user_page.dart';
 import 'package:flutter/material.dart';
-import 'package:alsintan_app/models/font.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:alsintan_app/models/user.dart';
+import 'package:alsintan_app/services/myserverconfig.dart';
 
 class DaftarUser extends StatefulWidget {
   @override
@@ -9,37 +12,61 @@ class DaftarUser extends StatefulWidget {
 }
 
 class _DaftarUser extends State<DaftarUser> {
-  final List<String> alsintanNames = [
-    "User 1",
-    "User 2",
-    "User 3",
-    "User 4",
-    "User 5",
-    "User 6",
-    "User 7",
-    "User 8",
-    "User 9"
-  ];
+  List<User> userList = <User>[];
 
   @override
   void initState() {
     super.initState();
+    loadUsers();
+  }
+
+  Future<void> loadUsers() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final savedToken = prefs.getString('access_token');
+
+      if (savedToken == null) {
+        throw Exception('No token found');
+      }
+
+      final uri = '${MyServerConfig.server}/admin/user-all';
+      final response = await http.get(
+        Uri.parse(uri),
+        headers: {
+          'Authorization': 'Bearer $savedToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        if (data['data'] == null) {
+          throw Exception('Data field is missing in the response');
+        }
+
+        final List<dynamic> userJson = data['data'];
+        setState(() {
+          userList = userJson.map((json) => User.fromJson(json)).toList();
+        });
+      } else {
+        print('Failed to load users, status code: ${response.statusCode}');
+        throw Exception('Failed to load users');
+      }
+    } catch (e) {
+      print('Exception: $e');
+      throw Exception('Failed to load users: $e');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     double lebarLayar = MediaQuery.of(context).size.width;
-    double tinggiLayar = MediaQuery.of(context).size.height;
-    double baseWidth = 375;
-    double fem = MediaQuery.of(context).size.width / baseWidth;
-    double ffem = fem * 0.97;
 
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading:
-            false, // Menyembunyikan tombol back bawaan AppBar
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
-        elevation: 0, // Menghilangkan bayangan di bawah AppBar
+        elevation: 0,
         title: Padding(
           padding: const EdgeInsets.symmetric(vertical: 24),
           child: Row(
@@ -112,55 +139,58 @@ class _DaftarUser extends State<DaftarUser> {
         ),
       ),
       body: SafeArea(
-        child: ListView.builder(
-          itemCount: alsintanNames.length,
-          itemBuilder: (context, index) {
-            return InkWell(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => DetailUser(),
-                  ),
-                );
-              },
-              child: Container(
-                width: lebarLayar,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-                margin: const EdgeInsets.only(bottom: 8.0),
-                decoration: BoxDecoration(
-                  color: Color(0xFFF8F8F8),
-                  border: Border.all(
-                    color: Color(0xFFF4F4F4),
-                    width: 1,
-                  ),
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+        child: userList.isEmpty
+            ? Center(child: CircularProgressIndicator())
+            : ListView.builder(
+                itemCount: userList.length,
+                itemBuilder: (context, index) {
+                  return InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              DetailUser(user: userList[index]),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      width: lebarLayar,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 24),
+                      margin: const EdgeInsets.only(bottom: 8.0),
+                      decoration: BoxDecoration(
+                        color: Color(0xFFF8F8F8),
+                        border: Border.all(
+                          color: Color(0xFFF4F4F4),
+                          width: 1,
+                        ),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Text(
-                            alsintanNames[index],
-                            style: TextStyle(
-                              color: Color(0xFF333333),
-                              fontSize: 14,
-                              fontFamily: 'Plus Jakarta Sans',
-                              fontWeight: FontWeight.w600,
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  userList[index].namaLengkap,
+                                  style: TextStyle(
+                                    color: Color(0xFF333333),
+                                    fontSize: 14,
+                                    fontFamily: 'Plus Jakarta Sans',
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
                     ),
-                  ],
-                ),
+                  );
+                },
               ),
-            );
-          },
-        ),
       ),
     );
   }

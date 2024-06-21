@@ -1,5 +1,10 @@
+import 'dart:convert';
+
+import 'package:alsintan_app/models/profile.dart';
+import 'package:alsintan_app/services/myserverconfig.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class DetailProfile extends StatefulWidget {
   @override
@@ -11,24 +16,99 @@ class _DetailProfile extends State<DetailProfile> {
   TextEditingController nomorHpController = TextEditingController();
   TextEditingController alamatController = TextEditingController();
 
+  late int userId;
+  late String role;
+
   @override
   void initState() {
     super.initState();
     loadProfileData();
+    loadSharedPreferences();
   }
 
-  Future<void> loadProfileData() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      setState(() {
-        namaLengkapController.text = prefs.getString('nama_lengkap') ?? '';
-        nomorHpController.text = prefs.getString('no_hp') ?? '';
-        alamatController.text = prefs.getString('alamat') ?? '';
-      });
+  Future<void> loadSharedPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      userId = prefs.getInt('id') ?? 0;
+      role = prefs.getString('role') ?? '';
+    });
+  }
 
-      print('${namaLengkapController.text}');
+
+  Future<void> loadProfileData() async {
+    final url = '${MyServerConfig.server}/pengguna/user';
+    final prefs = await SharedPreferences.getInstance();
+    final savedToken = prefs.getString('access_token');
+
+    if (savedToken == null) {
+      print('No token found');
+      return;
+    }
+
+    try {
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Bearer $savedToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        final profileData = Profile.fromJson(responseData['data']);
+
+        setState(() {
+          namaLengkapController.text = profileData.namaLengkap;
+          nomorHpController.text = profileData.noHp;
+          alamatController.text = profileData.alamat; 
+          userId = profileData.id;
+          role = profileData.role;
+        });
+      } else {
+        print('Failed to load profile data: ${response.body}');
+      }
     } catch (e) {
       print('Error loading profile data: $e');
+    }
+  }
+
+  Future<void> updateProfile() async {
+    final url = role == 'admin'
+        ? '${MyServerConfig.server}/admin/update-user/$userId'
+        : '${MyServerConfig.server}/pengguna/update-user/$userId';
+
+    final prefs = await SharedPreferences.getInstance();
+    final savedToken = prefs.getString('access_token');
+
+    if (savedToken == null) {
+      print('No token found');
+      return;
+    }
+
+    final body = jsonEncode(<String, String>{
+      'nama_lengkap': namaLengkapController.text,
+      'no_hp': nomorHpController.text,
+      'alamat': alamatController.text,
+    });
+
+    final response = await http.put(
+      Uri.parse(url),
+      headers: {
+        'Authorization': 'Bearer $savedToken',
+        'Content-Type': 'application/json',
+      },
+      body: body,
+    );
+
+    if (response.statusCode == 200) {
+      // Update successful
+      print('Profile updated successfully');
+      print(response.body);
+      // Optionally, update local SharedPreferences here if needed
+    } else {
+      // Error in updating profile
+      print('Failed to update profile: ${response.body}');
+      // Handle error accordingly
     }
   }
 
@@ -388,7 +468,7 @@ class _DetailProfile extends State<DetailProfile> {
                       padding: const EdgeInsets.symmetric(horizontal: 24),
                       child: ElevatedButton(
                         onPressed: () {
-                          Navigator.pushReplacementNamed(context, '');
+                          updateProfile();
                         },
                         style: ElevatedButton.styleFrom(
                           primary: Color(0xFF31C48D), // Background color

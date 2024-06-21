@@ -1,6 +1,11 @@
+import 'dart:convert';
+
+import 'package:alsintan_app/models/profile.dart';
+import 'package:alsintan_app/services/myserverconfig.dart';
 import 'package:flutter/material.dart';
 import 'package:alsintan_app/models/font.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -8,7 +13,7 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilPage extends State<ProfilePage> {
-  String namaLengkap = '';
+  Profile? profile;
 
   @override
   void initState() {
@@ -17,13 +22,31 @@ class _ProfilPage extends State<ProfilePage> {
   }
 
   Future<void> loadProfileData() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      setState(() {
-        namaLengkap = prefs.getString('nama_lengkap') ?? '';
-      });
+    final url = '${MyServerConfig.server}/pengguna/user';
+    final prefs = await SharedPreferences.getInstance();
+    final savedToken = prefs.getString('access_token');
 
-      print('$namaLengkap');
+    if (savedToken == null) {
+      print('No token found');
+      return;
+    }
+
+    try {
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Bearer $savedToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        setState(() {
+          profile = Profile.fromJson(responseData['data']);
+        });
+      } else {
+        print('Failed to load profile data: ${response.body}');
+      }
     } catch (e) {
       print('Error loading profile data: $e');
     }
@@ -37,6 +60,7 @@ class _ProfilPage extends State<ProfilePage> {
     await prefs.remove('no_hp');
     await prefs.remove('alamat');
     await prefs.remove('role');
+    await prefs.remove('id');
     print('Token dihapus.');
 
     Navigator.pushReplacementNamed(context, '/login');
@@ -105,9 +129,7 @@ class _ProfilPage extends State<ProfilePage> {
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     Text(
-                                      namaLengkap.isNotEmpty
-                                              ? namaLengkap[0]
-                                              : '',
+                                      '${profile?.namaLengkap?[0] ?? ""}',
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontSize: 38.40,
@@ -131,9 +153,7 @@ class _ProfilPage extends State<ProfilePage> {
                                       SizedBox(
                                         width: double.infinity,
                                         child: Text(
-                                          namaLengkap.isNotEmpty
-                                              ? namaLengkap
-                                              : '',
+                                          '${profile?.namaLengkap ?? ""}',
                                           style: TextStyle(
                                             color: Color(0xFF333333),
                                             fontSize: 16,

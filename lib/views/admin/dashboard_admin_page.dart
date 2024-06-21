@@ -1,7 +1,13 @@
+import 'dart:convert';
+
+import 'package:alsintan_app/models/db.dart';
+import 'package:alsintan_app/services/myserverconfig.dart';
 import 'package:alsintan_app/views/admin/daftar_user_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:alsintan_app/models/font.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class DashboardAdmin extends StatefulWidget {
   @override
@@ -9,9 +15,62 @@ class DashboardAdmin extends StatefulWidget {
 }
 
 class _DashboardAdmin extends State<DashboardAdmin> {
+  int totalAlsintan = 0; // Inisialisasi dengan nilai default
+  int totalUser = 0; // Inisialisasi dengan nilai default
+
+  @override
+  void initState() {
+    super.initState();
+    loadDb();
+  }
+
   Future<void> _refreshData() async {
-    // Logika pembaruan data disini
     await Future.delayed(Duration(seconds: 2));
+    loadDb();
+  }
+
+  Future<void> loadDb() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final savedToken = prefs.getString('access_token');
+
+      if (savedToken == null) {
+        throw Exception('No token found');
+      }
+
+      final response = await http.get(
+        Uri.parse('${MyServerConfig.server}/admin/dashboard'),
+        headers: {
+          'Authorization': 'Bearer $savedToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        DbResponse dbResponse =
+            DbResponse.fromJson(data); // Parse JSON into DbResponse object
+
+        // Now you can access totalAlsintan and totalUser directly from dbResponse
+        int fetchedTotalAlsintan = dbResponse.totalAlsintan;
+        int fetchedTotalUser = dbResponse.totalUser;
+
+        setState(() {
+          // Update state or perform other actions with dbResponse if needed
+          totalAlsintan = fetchedTotalAlsintan;
+          totalUser = fetchedTotalUser;
+        });
+
+        print('Total Alsintan: $totalAlsintan');
+        print('Total User: $totalUser');
+      } else {
+        print('Failed to load db status, status code: ${response.statusCode}');
+        throw Exception('Failed to load alsintas');
+      }
+    } catch (e) {
+      print('Exception: $e');
+      throw Exception('Failed to load alsintas');
+    }
   }
 
   @override
@@ -249,7 +308,7 @@ class _DashboardAdmin extends State<DashboardAdmin> {
                                                     ),
                                                   ),
                                                   Text(
-                                                    '20',
+                                                    '$totalAlsintan',
                                                     style: SafeGoogleFont(
                                                       'Plus Jakarta Sans',
                                                       fontSize: 24 * ffem,
@@ -362,7 +421,7 @@ class _DashboardAdmin extends State<DashboardAdmin> {
                                                     ),
                                                   ),
                                                   Text(
-                                                    '10',
+                                                    '$totalUser',
                                                     style: SafeGoogleFont(
                                                       'Plus Jakarta Sans',
                                                       fontSize: 16 * ffem,

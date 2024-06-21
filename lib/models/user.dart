@@ -1,36 +1,32 @@
 class User {
-  String? userid;
-  String? useremail;
-  String? username;
-  String? phone;
-  String? userpassword;
-  String? userdatereg;
+  final int id;
+  final String namaLengkap;
+  final String noHp;
+  final String alamat;
+  final String role;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
-  User(
-      {this.userid,
-      this.useremail,
-      this.username,
-      this.phone,
-      this.userpassword,
-      this.userdatereg});
+  User({
+    required this.id,
+    required this.namaLengkap,
+    required this.noHp,
+    required this.alamat,
+    required this.role,
+    required this.createdAt,
+    required this.updatedAt,
+  });
 
-  User.fromJson(Map<String, dynamic> json) {
-    userid = json['userid'];
-    useremail = json['useremail'];
-    username = json['username'];
-    phone = json['phone'];
-    userpassword = json['userpassword'];
-    userdatereg = json['userdatereg'];
-  }
+  factory User.fromJson(Map<String, dynamic> json) {
+  return User(
+    id: json['id'],
+    namaLengkap: json['nama_lengkap'],
+    noHp: json['no_hp'],
+    alamat: json['alamat'] ?? '', // Provide an empty string as default if 'alamat' is null
+    role: json['role'],
+    createdAt: DateTime.parse(json['created_at']),
+    updatedAt: DateTime.parse(json['updated_at']),
+  );
+}
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['userid'] = userid;
-    data['useremail'] = useremail;
-    data['username'] = username;
-    data['phone'] = phone;
-    data['userpassword'] = userpassword;
-    data['userdatereg'] = userdatereg;
-    return data;
-  }
 }

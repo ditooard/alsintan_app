@@ -62,7 +62,6 @@ class MyApp extends StatelessWidget {
         '/landingPageUser': (context) => LandingPageUser(),
         '/profile': (context) => ProfilePage(),
         '/detailProfile': (context) => DetailProfile(),
-        '/detailUser': (context) => DetailUser(),
       },
     );
   }
