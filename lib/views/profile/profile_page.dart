@@ -86,7 +86,7 @@ class _ProfilPage extends State<ProfilePage> {
         child: SafeArea(
           child: Container(
             width: lebarLayar,
-            height: 730,
+            height: 800,
             padding: const EdgeInsets.only(top: 20),
             clipBehavior: Clip.antiAlias,
             decoration: BoxDecoration(color: Colors.white),

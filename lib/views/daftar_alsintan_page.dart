@@ -1,3 +1,4 @@
+import 'package:alsintan_app/views/qr_code_page.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -165,7 +166,13 @@ class _DaftarAlsintan extends State<DaftarAlsintan> {
                           IconButton(
                             icon: Icon(Icons.qr_code),
                             onPressed: () {
-                              // QR code button action
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => QRCodePage(
+                                      alsinta: alsintaList[index]),
+                                ),
+                              );
                             },
                           ),
                           const SizedBox(width: 12),

@@ -1,6 +1,10 @@
+import 'dart:convert';
+
+import 'package:alsintan_app/services/myserverconfig.dart';
 import 'package:flutter/material.dart';
 import 'package:alsintan_app/models/alsinta.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class DetailAlsintan extends StatefulWidget {
   final Alsinta alsinta;
@@ -15,10 +19,120 @@ class _DetailAlsintan extends State<DetailAlsintan> {
   late double screenWidth, screenHeight;
   String role = ''; // Variable untuk menyimpan role dari SharedPreferences
 
+  TextEditingController _pemilikAlsintanController = TextEditingController();
+  TextEditingController _kelompokTaniController = TextEditingController();
+  TextEditingController _profesiPemilikController = TextEditingController();
+  TextEditingController _profesiSampinganController = TextEditingController();
+  TextEditingController _merkAlsintanController = TextEditingController();
+  TextEditingController _asalAlsintanController = TextEditingController();
+  TextEditingController _pertamaPenggunaanController = TextEditingController();
+  TextEditingController _terakhirPenggunaanController = TextEditingController();
+  TextEditingController _daerahPenggunaanController = TextEditingController();
+  TextEditingController _waktuOperasionalController = TextEditingController();
+  TextEditingController _perawatanHarianController = TextEditingController();
+  TextEditingController _tempatPembelianSukuCadangController =
+      TextEditingController();
+  TextEditingController _pendanaanPerawatanController = TextEditingController();
+  TextEditingController _tempatPembelianBahanBakarController =
+      TextEditingController();
+  TextEditingController _kendalaPerawatanController = TextEditingController();
+  TextEditingController _terakhirServiceController = TextEditingController();
+  TextEditingController _bengkelTerdekatController = TextEditingController();
+  TextEditingController _bengkelTerdekatPerawatanController =
+      TextEditingController();
+  TextEditingController _tanggapanUserController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
     loadRole();
+    _pemilikAlsintanController.text = widget.alsinta.namaPemilik ?? '';
+    _kelompokTaniController.text = widget.alsinta.kelompokTani ?? '';
+    _profesiPemilikController.text = widget.alsinta.profesiPemilik ?? '';
+    _profesiSampinganController.text =
+        widget.alsinta.profesiSampinganPemilik ?? '';
+    _merkAlsintanController.text = widget.alsinta.merk ?? '';
+    _asalAlsintanController.text = widget.alsinta.asalAlsintan ?? '';
+    _pertamaPenggunaanController.text =
+        widget.alsinta.pertamaPenggunaOperasional ?? '';
+    _terakhirPenggunaanController.text =
+        widget.alsinta.terahirPenggunaOperasional ?? '';
+    _daerahPenggunaanController.text =
+        widget.alsinta.daerahPenggunaanOperasional ?? '';
+    _waktuOperasionalController.text =
+        widget.alsinta.waktuOperasionalSekaliPakai ?? '';
+    _perawatanHarianController.text = widget.alsinta.perawatanHarian ?? '';
+    _tempatPembelianSukuCadangController.text =
+        widget.alsinta.tempatPembelianSukuCadang ?? '';
+    _pendanaanPerawatanController.text =
+        widget.alsinta.pendanaanPerawatan ?? '';
+    _tempatPembelianBahanBakarController.text =
+        widget.alsinta.tempatPembelianBahanBakar ?? '';
+    _kendalaPerawatanController.text = widget.alsinta.kendalaPerawatan ?? '';
+    _terakhirServiceController.text = widget.alsinta.terahirService ?? '';
+    _bengkelTerdekatController.text = widget.alsinta.bengkelTerdekat ?? '';
+    _bengkelTerdekatPerawatanController.text =
+        widget.alsinta.bengkelTerdekatPerawatan ?? '';
+    _tanggapanUserController.text =
+        widget.alsinta.tanggapanUserUntukAlsintan ?? '';
+  }
+
+  Future<void> updateAlsintan() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedToken = prefs.getString('access_token');
+
+    if (savedToken == null) {
+      print('No token found');
+      return;
+    }
+
+    final body = jsonEncode(<String, String>{
+      'nama_pemilik': _pemilikAlsintanController.text,
+      'kelompok_tani': _kelompokTaniController.text,
+      'profesi_pemilik': _profesiPemilikController.text,
+      'profesi_sampingan_pemilik': _profesiSampinganController.text,
+      'merk': _merkAlsintanController.text,
+      'asal_alsintan': _asalAlsintanController.text,
+      'pertama_pengguna_operasional': _pertamaPenggunaanController.text,
+      'terahir_pengguna_operasional': _terakhirPenggunaanController.text,
+      'daerah_penggunaan_operasional': _daerahPenggunaanController.text,
+      'waktu_operasional_sekali_pakai': _waktuOperasionalController.text,
+      'perawatan_harian': _perawatanHarianController.text,
+      'tempat_pembelian_suku_cadang': _tempatPembelianSukuCadangController.text,
+      'pendanaan_perawatan': _pendanaanPerawatanController.text,
+      'tempat_pembelian_bahan_bakar': _tempatPembelianBahanBakarController.text,
+      'kendala_perawatan': _kendalaPerawatanController.text,
+      'terahir_service': _terakhirServiceController.text,
+      'bengkel_terdekat': _bengkelTerdekatController.text,
+      'bengkel_terdekat_perawatan': _bengkelTerdekatPerawatanController.text,
+      'tanggapan_user_untuk_alsintan': _tanggapanUserController.text,
+    });
+
+    final response = await http.put(
+      Uri.parse(
+          '${MyServerConfig.server}/pengguna/update-alsintan/${widget.alsinta.id}'),
+      headers: {
+        'Authorization': 'Bearer $savedToken',
+        'Content-Type': 'application/json',
+      },
+      body: body,
+    );
+
+    if (response.statusCode == 200) {
+      // Update successful
+      print('Alsintan updated successfully');
+      print(response.body);
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text("Update Alsintan Berhasil."),
+        backgroundColor: Colors.green,
+      ));
+      Navigator.pushReplacementNamed(context, '/landingPageUser');
+      // Optionally, update local SharedPreferences here if needed
+    } else {
+      // Error in updating profile
+      print('Failed to update profile: ${response.body}');
+      // Handle error accordingly
+    }
   }
 
   void loadRole() async {
@@ -49,7 +163,7 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                 padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
                 child: ElevatedButton(
                   onPressed: () {
-                    // Add your onPressed logic here
+                    updateAlsintan();
                   },
                   style: ElevatedButton.styleFrom(
                     minimumSize: Size(200, 50),
@@ -221,7 +335,7 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                                   const EdgeInsets.symmetric(horizontal: 24),
                               child: TextFormField(
                                 textInputAction: TextInputAction.next,
-                                initialValue: widget.alsinta.namaPemilik,
+                                controller: _pemilikAlsintanController,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
@@ -281,7 +395,7 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                                   const EdgeInsets.symmetric(horizontal: 24),
                               child: TextFormField(
                                 textInputAction: TextInputAction.next,
-                                initialValue: widget.alsinta.kelompokTani,
+                                controller: _kelompokTaniController,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
@@ -341,7 +455,7 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                                   const EdgeInsets.symmetric(horizontal: 24),
                               child: TextFormField(
                                 textInputAction: TextInputAction.next,
-                                initialValue: widget.alsinta.profesiPemilik,
+                                controller: _profesiPemilikController,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
@@ -401,8 +515,7 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                                   const EdgeInsets.symmetric(horizontal: 24),
                               child: TextFormField(
                                 textInputAction: TextInputAction.next,
-                                initialValue:
-                                    widget.alsinta.profesiSampinganPemilik,
+                                controller: _profesiSampinganController,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
@@ -462,7 +575,7 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                                   const EdgeInsets.symmetric(horizontal: 24),
                               child: TextFormField(
                                 textInputAction: TextInputAction.next,
-                                initialValue: widget.alsinta.merk,
+                                controller: _merkAlsintanController,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
@@ -522,7 +635,7 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                                   const EdgeInsets.symmetric(horizontal: 24),
                               child: TextFormField(
                                 textInputAction: TextInputAction.next,
-                                initialValue: widget.alsinta.asalAlsintan,
+                                controller: _asalAlsintanController,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
@@ -582,8 +695,7 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                                   const EdgeInsets.symmetric(horizontal: 24),
                               child: TextFormField(
                                 textInputAction: TextInputAction.next,
-                                initialValue:
-                                    widget.alsinta.pertamaPenggunaOperasional,
+                                controller: _pertamaPenggunaanController,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
@@ -643,8 +755,7 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                                   const EdgeInsets.symmetric(horizontal: 24),
                               child: TextFormField(
                                 textInputAction: TextInputAction.next,
-                                initialValue:
-                                    widget.alsinta.terahirPenggunaOperasional,
+                                controller: _terakhirPenggunaanController,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
@@ -704,8 +815,7 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                                   const EdgeInsets.symmetric(horizontal: 24),
                               child: TextFormField(
                                 textInputAction: TextInputAction.next,
-                                initialValue:
-                                    widget.alsinta.daerahPenggunaanOperasional,
+                                controller: _daerahPenggunaanController,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
@@ -765,8 +875,7 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                                   const EdgeInsets.symmetric(horizontal: 24),
                               child: TextFormField(
                                 textInputAction: TextInputAction.next,
-                                initialValue:
-                                    widget.alsinta.waktuOperasionalSekaliPakai,
+                                controller: _waktuOperasionalController,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
@@ -826,7 +935,7 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                                   const EdgeInsets.symmetric(horizontal: 24),
                               child: TextFormField(
                                 textInputAction: TextInputAction.next,
-                                initialValue: widget.alsinta.perawatanHarian,
+                                controller: _perawatanHarianController,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
@@ -886,8 +995,8 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                                   const EdgeInsets.symmetric(horizontal: 24),
                               child: TextFormField(
                                 textInputAction: TextInputAction.next,
-                                initialValue:
-                                    widget.alsinta.tempatPembelianSukuCadang,
+                                controller:
+                                    _tempatPembelianSukuCadangController,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
@@ -947,7 +1056,7 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                                   const EdgeInsets.symmetric(horizontal: 24),
                               child: TextFormField(
                                 textInputAction: TextInputAction.next,
-                                initialValue: widget.alsinta.pendanaanPerawatan,
+                                controller: _pendanaanPerawatanController,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
@@ -1006,9 +1115,9 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 24),
                               child: TextFormField(
+                                controller:
+                                    _tempatPembelianBahanBakarController,
                                 textInputAction: TextInputAction.next,
-                                initialValue:
-                                    widget.alsinta.tempatPembelianBahanBakar,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
@@ -1068,7 +1177,7 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                                   const EdgeInsets.symmetric(horizontal: 24),
                               child: TextFormField(
                                 textInputAction: TextInputAction.next,
-                                initialValue: widget.alsinta.kendalaPerawatan,
+                                controller: _kendalaPerawatanController,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
@@ -1128,7 +1237,7 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                                   const EdgeInsets.symmetric(horizontal: 24),
                               child: TextFormField(
                                 textInputAction: TextInputAction.next,
-                                initialValue: widget.alsinta.terahirService,
+                                controller: _terakhirServiceController,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
@@ -1188,7 +1297,7 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                                   const EdgeInsets.symmetric(horizontal: 24),
                               child: TextFormField(
                                 textInputAction: TextInputAction.next,
-                                initialValue: widget.alsinta.bengkelTerdekat,
+                                controller: _bengkelTerdekatController,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
@@ -1248,8 +1357,7 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                                   const EdgeInsets.symmetric(horizontal: 24),
                               child: TextFormField(
                                 textInputAction: TextInputAction.next,
-                                initialValue:
-                                    widget.alsinta.bengkelTerdekatPerawatan,
+                                controller: _bengkelTerdekatPerawatanController,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
@@ -1309,8 +1417,7 @@ class _DetailAlsintan extends State<DetailAlsintan> {
                                   const EdgeInsets.symmetric(horizontal: 24),
                               child: TextFormField(
                                 textInputAction: TextInputAction.next,
-                                initialValue:
-                                    widget.alsinta.tanggapanUserUntukAlsintan,
+                                controller: _tanggapanUserController,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12), // Set text color
